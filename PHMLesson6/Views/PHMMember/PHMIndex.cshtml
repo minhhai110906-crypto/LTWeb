@@ -1,0 +1,53 @@
+@model IEnumerable<PHMLesson6.Models.PHMMember>
+
+@{
+    ViewData["Title"] = "PHMIndex";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="PHMCreate">Create New</a>
+</p>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PHMMemberUserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PHMMemberPassword)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PHMMemberEmail)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PHMMemberFullName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.PHMMemberUserName)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.PHMMemberPassword)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.PHMMemberEmail)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.PHMMemberFullName)
+            </td>
+            <td>
+                <a asp-action="PHMEdit" asp-route-id="@item.PHMMemberId">Edit</a> |
+                <a asp-action="PHMGetDetails" asp-route-id="@item.PHMMemberId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.PHMMemberId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
