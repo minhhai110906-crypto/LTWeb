@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "Student List";
+    Layout = "~/Views/Shared/MyLayout.cshtml";
+}
+@model IEnumerable<PHMLab1_16_10.Models.Student>
+<a href="/Admin/Student/Add" class="btn btn-primary mb-3">Create Student</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Mã</th>
+            <th>Họ tên</th>
+            <th>Ngày sinh</th>
+            <th>Ngành</th>
+            <th>Giới tính</th>
+            <th>Hệ ĐT</th>
+            <th>Địa chỉ</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.Id</td>
+                <td>@s.Name</td>
+                <td>@s.DateOfBorth.ToString("dd/MM/yyyy hh:mm:ss tt")</td>
+                <td>
+                    @{
+                        string str = "";
+                        switch (s.Branch)
+                        {
+                            case PHMLab1_16_10.Models.Branch.IT:
+                                str = "CNTT";
+                                break;
+                            case PHMLab1_16_10.Models.Branch.BE:
+                                str = "Kinh tế";
+                                break;
+                            case PHMLab1_16_10.Models.Branch.CE:
+                                str = "Công trình";
+                                break;
+                            case PHMLab1_16_10.Models.Branch.EE:
+                                str = "Điện - Điện tử";
+                                break;
+                        }
+                    }
+                    @str
+                </td>
+                <td>@(s.Gender == PHMLab1_16_10.Models.Gender.Male ? "Nam" : "Nữ")</td>
+                <td>@(s.IsRegular ? "Chính quy" : "Phi chính quy")</td>
+                <td>@s.Address</td>
+                <td>@s.Email</td>
+            </tr>
+        }
+    </tbody>
+</table>
