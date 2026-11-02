@@ -15,10 +15,25 @@ namespace PHMLab4TH26_10.Controllers
             db = context;
         }
 
-        public IActionResult Index()
+        private int pageSize = 3;
+
+        public IActionResult Index(int? mid)
         {
-            var learners = db.Learners.Include(m => m.Major).ToList();
-            return View(learners);
+            var learners = (IQueryable<Learner>)db.Learners
+                        .Include(m => m.Major);
+            if (mid != null)
+            {
+                learners = (IQueryable<Learner>)db.Learners
+                        .Where(l => l.MajorID == mid)
+                        .Include(m => m.Major);
+            }
+            // Tính số trang
+            int pageNum = (int)Math.Ceiling(learners.Count() / (float)pageSize);
+            // Trả số trang về view để hiển thị nav-trang
+            ViewBag.pageNum = pageNum;
+            // Lấy dữ liệu trang đầu
+            var result = learners.Take(pageSize).ToList();
+            return View(result);
         }
         public IActionResult Create()
         {
@@ -132,6 +147,55 @@ namespace PHMLab4TH26_10.Controllers
 
             db.SaveChanges();
             return RedirectToAction(nameof(Index));
+        }
+        public IActionResult LearnerByMajorID(int mid)
+        {
+            var learners = db.Learners
+                             .Where(l => l.MajorID == mid)
+                             .Include(m => m.Major)
+                             .ToList();
+            return PartialView("LearnerTable", learners);
+        }
+        public IActionResult LearnerFilter(int? mid, string? keyword, int? pageIndex)
+        {
+            // Lấy toàn bộ learners trong dbset chuyển về IQueryable<Learner> để query
+            var learners = (IQueryable<Learner>)db.Learners;
+
+            // Lấy chỉ số trang, nếu chỉ số trang null thì gán ngầm định bằng 1
+            int page = (int)(pageIndex == null || pageIndex <= 0 ? 1 : pageIndex);
+
+            // Nếu có mid thì lọc learner theo mid (chuyên ngành)
+            if (mid != null)
+            {
+                // Lọc
+                learners = learners.Where(l => l.MajorID == mid);
+                // Gửi mid về view để ghi lại trên nav-phân trang
+                ViewBag.mid = mid;
+            }
+
+            // Nếu có keyword thì tìm kiếm theo tên
+            if (keyword != null)
+            {
+                // Tìm kiếm
+                learners = learners.Where(l => l.FirstMidName.ToLower()
+                                                .Contains(keyword.ToLower()));
+                // Gửi keyword về view để ghi lại trên nav-phân trang
+                ViewBag.keyword = keyword;
+            }
+
+            // Tính số trang
+            int pageNum = (int)Math.Ceiling(learners.Count() / (float)pageSize);
+
+            // Gửi số trang về view để hiển thị nav-trang
+            ViewBag.pageNum = pageNum;
+
+            // Chọn dữ liệu trong trang hiện tại
+            var result = learners.Skip(pageSize * (page - 1))
+                                 .Take(pageSize)
+                                 .Include(m => m.Major)
+                                 .ToList();
+
+            return PartialView("LearnerTable", result);
         }
     }
 }
